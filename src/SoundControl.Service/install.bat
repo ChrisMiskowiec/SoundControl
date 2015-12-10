@@ -1,0 +1,2 @@
+SoundControl.Service install
+pause

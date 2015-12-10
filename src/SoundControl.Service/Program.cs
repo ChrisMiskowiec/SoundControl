@@ -1,10 +1,4 @@
-﻿using Akka.Actor;
-using Microsoft.Owin.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Topshelf;
 
 namespace SoundControl.Service
 {
@@ -12,15 +6,21 @@ namespace SoundControl.Service
     {
         static void Main(string[] args)
         {
-            using (WebApp.Start<OwinStartup>("http://+:8080"))
-            using (var system = ActorSystem.Create("my-actor-server"))
+            HostFactory.Run(x =>
             {
-                var soundActor = system.ActorOf<SystemSoundActor>();
+                x.Service<SoundControlService>(s =>
+                {
+                    s.ConstructUsing(n => new SoundControlService());
+                    s.WhenStarted(tc => tc.Start());
+                    s.WhenStopped(tc => tc.Stop());
+                });
+                x.RunAsNetworkService();
 
-                Console.ReadLine();
-
-                system.Shutdown();
-            }
+                x.SetDescription("System Sound Control");
+                x.SetDisplayName("Sound Control");
+                x.SetServiceName("SoundControl");
+            });
+            System.Console.ReadLine();
         }
     }
 }

@@ -1,0 +1,2 @@
+SoundControl.Service uninstall
+pause
